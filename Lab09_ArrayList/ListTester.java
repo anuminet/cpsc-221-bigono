@@ -178,7 +178,7 @@ public class ListTester {
 		testSingleElementList(emptyList_addA_A,"emptyList_addA_A", LIST_A, STRING_A);
 
 			// Scenario: 05
-
+		testSingleElementList(emptyList_addAtIndex0A_A,"emptyList_addAtIndex0A_A", LIST_A, STRING_A);
 			
 		//1-element to empty list
 			// Scenario: 12
@@ -355,6 +355,12 @@ public class ListTester {
 	/** Scenario #05: [] -> add(0, A) -> [A] 
 	 * @return [A] after add(0, A)
 	 */
+	private IndexedUnsortedList<Integer> emptyList_addAtIndex0A_A() {
+		IndexedUnsortedList<Integer> list = newList();
+		list.add(0, ELEMENT_A);
+		return list;
+	}
+	private Scenario<Integer> emptyList_addAtIndex0A_A = () -> emptyList_addAtIndex0A_A();
 
 	/** Scenario #06: [A] -> addToFront(B) -> [B,A] 
 	 * @return [B,A] after addToFront(B)
