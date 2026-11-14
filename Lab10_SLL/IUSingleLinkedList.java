@@ -53,16 +53,21 @@ public class IUSingleLinkedList<E> implements IndexedUnsortedList<E> {
 
 	@Override
 	public E removeFirst() {
-		// TODO 
-		return null;
+		E result = remove(front.getElement());
+		/* Goes to the remove method which takes an element
+		filters to make sure the element is in the list
+		Then moves the element and the node before it to the remove element
+		which removes the element sets the rear and
+		front nodes if needed  and modifies the counts */
+
+		return result; //Returns the result element.
 	}
 
 	@Override
  	public E removeLast() {
-		LinearNode<E> result = new LinearNode<E>(); // Makes new linear node to store element
-		result = rear; // Makes result the element we want to get
-		remove(last()); 
-		return result.getElement();
+		E result = remove(rear.getElement());//See the above method to view logic
+
+		return result;//Returns the result of the remove methods
 	}
 
 	@Override
@@ -84,8 +89,18 @@ public class IUSingleLinkedList<E> implements IndexedUnsortedList<E> {
 
 	@Override
 	public E remove(int index) {
-		// TODO 
-		return null;
+		if(index > count - 1 || index < 0) throw new NoSuchElementException(); //Guard statement to make sure index is in bounds of list
+		E result = null;// Setting result for be returned
+
+		LinearNode<E> getter = front; //Makes a getter node to run down the list and get the wanted node
+
+		for(int i = 0; i < index; i ++){// May have to fiddle with the logic of for loop upon testing.
+			
+			getter = getter.getNext();//Sifts through and gets the node at the correct index
+		}
+		result = remove(getter.getElement());//Logic for remove in removeFirst()
+
+		return result; //Returns element
 	}
 
 	@Override
