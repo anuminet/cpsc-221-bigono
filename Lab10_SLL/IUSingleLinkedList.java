@@ -197,6 +197,7 @@ public class IUSingleLinkedList<E> implements IndexedUnsortedList<E> {
 
 		// Set new element 
 		current.setElement(element);
+		modCount++;
 	}
 
 	@Override
@@ -237,11 +238,15 @@ public class IUSingleLinkedList<E> implements IndexedUnsortedList<E> {
 
 	@Override
 	public E first() {
+		if (isEmpty()) throw new NoSuchElementException();
+
 		return front.getElement(); //returns linear node front
 	}
 
 	@Override
 	public E last() {
+		if (isEmpty()) throw new NoSuchElementException();
+		
 		return rear.getElement(); //returns linear node rear
 	}
 
