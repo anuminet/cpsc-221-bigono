@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
  * NOTE: One example test is given for each interface method using a new list to
  * get you started.
  * 
- * @author mvail, mhthomas, amussell (lambdas), lsevigny (iterator decorator)
+ * @author lsevigny
  */
 public class ListTester {
 	//possible lists that could be tested
@@ -498,8 +498,7 @@ public class ListTester {
 	 */
 
 	private IndexedUnsortedList<Integer> AB_removeA_B() {
-		IndexedUnsortedList<Integer> list = emptyList_addToFrontA_A();
-		list.addToRear(ELEMENT_B);
+		IndexedUnsortedList<Integer> list = A_addToRearB_AB();
 		list.remove(ELEMENT_A);
 		return list;
 	}
@@ -520,8 +519,7 @@ public class ListTester {
 	 * @return [B] after remove(0)
 	 */
 	private IndexedUnsortedList<Integer> AB_removeIndex0_B() {
-		IndexedUnsortedList<Integer> list = emptyList_addToFrontA_A(); 
-		list.addToRear(ELEMENT_B);
+		IndexedUnsortedList<Integer> list = A_addToRearB_AB(); 
 		list.remove(0);
 		return list;
 	}
@@ -530,8 +528,7 @@ public class ListTester {
 	 * @return [A] after remove(1)
 	 */
 	private IndexedUnsortedList<Integer> AB_remove1_A() {
-    IndexedUnsortedList<Integer> list = emptyList_addToFrontA_A();
-    list.addToRear(ELEMENT_B);
+    IndexedUnsortedList<Integer> list = A_addToRearB_AB();
     list.remove(1);
     return list;
 }
@@ -986,7 +983,6 @@ private Scenario<Integer> AB_remove1_A = () -> AB_remove1_A();
 			printTest(scenarioName + "_testToString", testToString(scenario.build(), Result.ValidString));
 			
 			// Iterator
-				// TODO: will add in Lab 10
 				// test to construct iterator
 			printTest(scenarioName + "_testIter", testIter(scenario.build(), Result.NoException));
 				// tests after getting iterator	
@@ -1033,7 +1029,6 @@ private Scenario<Integer> AB_remove1_A = () -> AB_remove1_A();
 	private void testThreeElementList(Scenario<Integer> scenario, String scenarioName, Integer[] contents, String contentsString) {
 		System.out.printf("\nSCENARIO: %s\n\n", scenarioName);
 		try {
-			//TODO: tests for scenarios resulting in a 3-element list
 			// IndexedUnsortedList
 
 			// ADD TESTS
@@ -1104,7 +1099,6 @@ private Scenario<Integer> AB_remove1_A = () -> AB_remove1_A();
 			printTest(scenarioName + "_testToString", testToString(scenario.build(), Result.ValidString));
 
 			// Iterator
-				// TODO: will add in Lab 10
 				// test to construct iterator
 			printTest(scenarioName + "_testIter", testIter(scenario.build(), Result.NoException));
 				// tests after getting iterator	
