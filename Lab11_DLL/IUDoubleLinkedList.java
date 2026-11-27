@@ -188,7 +188,7 @@ public class IUDoubleLinkedList<E> implements IndexedUnsortedList<E> {
             //throws exception if there are no elements in the list
         BidirectionalNode<E> sifter = head;
             //Creates node to go through list
-        while(!sifter.getElement().equals(element) && sifter != null){
+        while(sifter != null && !sifter.getElement().equals(element)){
             sifter = sifter.getNext();
         }
             //Goes through list until we either get to the end of the list or find the target element
@@ -283,7 +283,7 @@ public class IUDoubleLinkedList<E> implements IndexedUnsortedList<E> {
         int index = 0;
 
         // Traverse the list until the element is found
-        while(!sifter.getElement().equals(element) && sifter != null){
+        while(sifter != null && !sifter.getElement().equals(element)){
             sifter = sifter.getNext();
             index++;
         }
