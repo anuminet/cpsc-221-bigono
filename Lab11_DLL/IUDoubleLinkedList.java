@@ -66,7 +66,7 @@ public class IUDoubleLinkedList<E> implements IndexedUnsortedList<E> {
        BidirectionalNode<E> inserter = new BidirectionalNode<E>(element);
        //Creates two nodes for use in method
 
-       while (node != null || node.getElement().equals(target)) {
+       while (node != null && node.getElement().equals(target)) {
             node = node.getNext();
        }
        //Goes through list to find element
@@ -119,46 +119,135 @@ public class IUDoubleLinkedList<E> implements IndexedUnsortedList<E> {
 
     @Override
     public E removeFirst() {
-        // TODO: Implement
-        throw new UnsupportedOperationException();
+        if(isEmpty()) throw new NoSuchElementException();
+        //Sends exception if list is empty
+        E result = head.getElement();
+        //Stores the element to be returned
+        head = head.getNext();
+        head.setPrevious(null);
+        //Sets new head and removes its previous essentially removing the element
+        count--;
+        modCount++;
+        //Changes counts
+        return result;
     }
 
     @Override
     public E removeLast() {
-        // TODO: Implement
-        throw new UnsupportedOperationException();
+        if(isEmpty()) throw new NoSuchElementException();
+        //Sends exception if the list is empty
+        E result = tail.getElement();
+        //Stores the element to be returned
+        tail = tail.getPrevious();
+        tail.setNext(null);
+        //Sets new tail and removes its next to null essentially removing the element
+        count--;
+        modCount++;
+        //Changes counts
+        return result;
     }
 
     @Override
     public E remove(E element) {
-        // TODO: Implement
-        throw new UnsupportedOperationException();
+        if(isEmpty()) throw new NoSuchElementException();
+            //throws exception if there are no elements in the list
+        BidirectionalNode<E> sifter = head;
+            //Creates node to go through list
+        while(!sifter.getElement().equals(sifter) && sifter != null){
+            sifter = sifter.getNext();
+        }
+            //Goes through list until we either get to the end of the list or find the target element
+        if(sifter == null){
+            throw new NoSuchElementException();
+        }
+            //Throws exception if the element doesnt exist
+        E result = sifter.getElement();
+        sifter.getPrevious().setNext(sifter.getNext());
+        sifter.getNext().setPrevious(sifter.getPrevious());
+            //Makes a result to keep element and removes the element from the list
+        count--;
+        modCount++;
+            //Changes counts and returns the object
+        return result;
+
+
     }
 
     @Override
     public E remove(int index) {
-        // TODO: Implement
-        throw new UnsupportedOperationException();
+        if(index < 0 || index >= count) throw new NoSuchElementException();
+            //Throws exception if index is out of bounds of the list
+        if(index == count -1){
+            return removeLast();
+        }
+        if(index == 0){
+            return removeFirst();
+        }
+            //If the index is at beginning or end of list uses those methods to avoid loop if possible
+        BidirectionalNode<E> sifter = head;
+        for(int i = 0; i < index; i++){
+            sifter = sifter.getNext();
+        }
+            //Sifts through list to find element at the correct index
+        E result = sifter.getElement();
+        sifter.getPrevious().setNext(sifter.getNext());
+        sifter.getNext().setPrevious(sifter.getPrevious());
+            //Sets the element to result and removes the element by attaching the surrounding nodes
+            //to the correct nodes
+        count--;
+        modCount++;
+            //Adjust counts and return result
+        return result;
     }
 
     /*=====ACCESS AND UPDATE METHODS=====*/
 
     @Override
     public void set(int index, E element) {
-        // TODO: Implement
-        throw new UnsupportedOperationException();
+        if(index > 0 || index >= count) throw new IndexOutOfBoundsException();
+        //Catches if index given is outside of the bounds of the list
+        BidirectionalNode<E> sifter = head;
+        //Creates node to sift through the list
+        for(int i = 0; i < index; i++){
+            sifter = sifter.getNext();
+        }
+        //Goes through list until we get to the index
+        sifter.setElement(element);
+        //sets the element
     }
 
     @Override
     public E get(int index) {
-        // TODO: Implement
-        throw new UnsupportedOperationException();
+        if(index < 0 || index >= count) throw new IndexOutOfBoundsException();
+        
+        BidirectionalNode<E> sifter = head;
+       //Creates a node to sift through the list
+        for (int i = 0; i < index; i++){
+        sifter = sifter.getNext();
+        }
+       //Sifts through till we get to the index
+        return sifter.getElement();
+       //returns the sifter element which is the element 
     }
 
     @Override
     public int indexOf(E element) {
-        // TODO: Implement
-        throw new UnsupportedOperationException();
+        if(isEmpty()) throw new NoSuchElementException();
+        //Catches aned throws exception for empty lists
+        BidirectionalNode<E> sifter = head;
+        int index = 0;
+        //Creates node to sort through list
+        while(!sifter.getElement().equals(element) && sifter != null){
+            sifter = sifter.getNext();
+            index++;
+        }
+        //Goes through list and stops once element is found or reaches end of list which would be null
+        //and increases the index each time
+        if(sifter == null){
+            return -1;
+            //Returns if the element is null meaning its not found
+        }
+        return index;
     }
 
     @Override
@@ -177,8 +266,19 @@ public class IUDoubleLinkedList<E> implements IndexedUnsortedList<E> {
 
     @Override
     public boolean contains(E target) {
-        // TODO: Implement
-        throw new UnsupportedOperationException();
+        if(isEmpty()) throw new NoSuchElementException();
+        //Catches aned throws exception for empty lists
+        BidirectionalNode<E> sifter = head;
+        //Creates node to sort through list
+        while(!sifter.getElement().equals(target) && sifter != null){
+            sifter = sifter.getNext();
+        }
+        //Goes through list and stops once element is found or reaches end of list which would be null
+        if(sifter.getElement().equals(target)){
+        return true;
+        }
+        return false;
+        //Returns true if the sifter is the target that we are looking for false if null
     }
 
     @Override
