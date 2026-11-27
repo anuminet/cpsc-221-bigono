@@ -1,4 +1,5 @@
 
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
@@ -382,39 +383,85 @@ public class IUDoubleLinkedList<E> implements IndexedUnsortedList<E> {
         /*=====ITERATOR CONSTRUCTOR=====*/
 
         public DoubleLinkedListIterator(int startingIndex) {
-            // TODO: Validate startingIndex
-            // TODO: Locate the node at startingIndex
-            // TODO: Initialize cursor and modification tracking
+            // Validate Starting Index
+            if (startingIndex < 0 || startingIndex > count) {
+                throw new IndexOutOfBoundsException();
+            }
 
-            throw new UnsupportedOperationException();
+            // Find the node at the starting position
+            nextNode = head;
+
+            for (int i = 0; i < startingIndex; i++) {
+                nextNode = nextNode.getNext();
+            }
+
+            // Initalize remaining fields
+            nextIndex = startingIndex;
+            lastReturned = null;
+            expectedModCount = modCount;
         }
 
         /*=====FORWARD TRAVERSAL=====*/
 
         @Override
         public boolean hasNext() {
-            // TODO: Implement
-            throw new UnsupportedOperationException();
+            return nextNode != null;
         }
 
         @Override
         public E next() {
-            // TODO: Implement
-            throw new UnsupportedOperationException();
+            // Checks list wasn't modified outside iterator
+            if (expectedModCount != modCount) {
+                throw new ConcurrentModificationException();
+            }
+            
+            // Determines another element exists
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            } 
+            
+            // Saves node being returned
+            lastReturned = nextNode;
+            // Moves to the next node
+            nextNode = nextNode.getNext();
+            // Updates cursor position
+            nextIndex++;
+
+            return lastReturned.getElement();
         }
 
         /*=====BACKWARD TRAVERSAL=====*/
 
         @Override
         public boolean hasPrevious() {
-            // TODO: Implement
-            throw new UnsupportedOperationException();
+            return nextIndex > 0;
         }
 
         @Override
         public E previous() {
-            // TODO: Implement
-            throw new UnsupportedOperationException();
+            // Checks for modifications outside of iterator
+            if (expectedModCount != modCount) {
+                throw new ConcurrentModificationException();
+            }
+
+            // Determines previous element
+            if (!hasPrevious()) {
+                throw new NoSuchElementException();
+            }
+
+            // Moves backwards through the list
+            if (nextNode == null) {
+                nextNode = tail;
+            } else {
+                nextNode = nextNode.getPrevious();
+            }
+
+            // Saves node being returned
+            lastReturned = nextNode;
+            // Updates cursor position
+            nextIndex--;
+            
+            return lastReturned.getElement();
         }
 
         /*=====CURSOR POSITION=====*/
