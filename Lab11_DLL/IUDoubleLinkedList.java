@@ -25,31 +25,44 @@ public class IUDoubleLinkedList<E> implements IndexedUnsortedList<E> {
 
     @Override
     public void addToFront(E element) {
+
+        // New node to store Element
         BidirectionalNode<E> node = new BidirectionalNode<E>(element);
-        //New node to store Element
-        node.setNext(head);
-        head.setPrevious(node);
-        // Grabs the next node as to not lose the list
-        head = node;
-        //Sets the new head shouldnt need to change tail
-        if(isEmpty()) tail = node;
-        //If its a empty list the tail must become the head
+
+        // If the list is empty, set both head & tail to the new node
+        if (isEmpty()) {
+            head = node;
+            tail = node;
+        } else {
+            // Connect new node to current head
+            node.setNext(head);
+            head.setPrevious(node);
+            // Set new node as the head
+            head = node;
+        }
+        // Increment the element & modification counts
         count++;
         modCount++;
-        //Changes both count and modcount
     }
 
     @Override
     public void addToRear(E element) {
+
+        // New node to store Element
         BidirectionalNode<E> node = new BidirectionalNode<E>(element);
-        //New node to store Element
-        tail.setNext(node);
-        node.setPrevious(tail);
-        //Makes sure to attach node 
-        tail = node;
-        //sets node as rear
-        if(isEmpty()) head = node;
-        //if empty sets the head as well
+
+        // If the list is empty, set both head & tail to the new node
+        if (isEmpty()) {
+            head = node;
+            tail = node;
+        } else {
+            // Connect the new node to the current tail
+            tail.setNext(node);
+            node.setPrevious(tail);
+            // Set the new node as the tail
+            tail = node;
+        }
+        // Increment the element & modification counts
         count++;
         modCount++;
     }
@@ -62,16 +75,21 @@ public class IUDoubleLinkedList<E> implements IndexedUnsortedList<E> {
 
     @Override
     public void addAfter(E element, E target) {
-       BidirectionalNode<E> node = head;//
+       BidirectionalNode<E> node = head;
        BidirectionalNode<E> inserter = new BidirectionalNode<E>(element);
        //Creates two nodes for use in method
 
-       while (node != null && node.getElement().equals(target)) {
+       while (node != null && !node.getElement().equals(target)) {
             node = node.getNext();
        }
        //Goes through list to find element
-       if(node.getElement() == null){
+       if(node == null){
         throw new NoSuchElementException();
+       }
+       // If the target is the tail, add to the rear
+       if (node == tail) {
+        addToRear(element);
+        return;
        }
        //If element doesnt exist throws exception
        inserter.setNext(node.getNext());
@@ -87,13 +105,15 @@ public class IUDoubleLinkedList<E> implements IndexedUnsortedList<E> {
 
     @Override
     public void add(int index, E element) {
-        if(index > count || index > count) throw new IndexOutOfBoundsException();
+        if(index < 0 || index > count) throw new IndexOutOfBoundsException();
         //Catches if index provided is out of bounds of the list
         if(index == 0){
             addToFront(element);
+            return;
         //if the index is zero it's essentially adding to the front
         }else if (index == count){
             addToRear(element);
+            return;
         //catches if the index is the end in which case we can use the add to rear
         }
         BidirectionalNode<E> node = head;
@@ -103,11 +123,11 @@ public class IUDoubleLinkedList<E> implements IndexedUnsortedList<E> {
             node = node.getNext();
             //Traverses the list
         }
-         //Copied from the above addAfter method in theory it should be the same
-        inserter.setNext(node.getNext());
-        inserter.setPrevious(node);
-        node.getNext().setPrevious(inserter);
-        node.setNext(inserter);
+         // Insert the new node before the node at the specified index
+        inserter.setNext(node);
+        inserter.setPrevious(node.getPrevious());
+        node.getPrevious().setNext(inserter);
+        node.setPrevious(inserter);
        //Sets in order all directions of nodes to their proper nexts and previouses in the proper order
         count++;
         modCount++;
@@ -123,12 +143,20 @@ public class IUDoubleLinkedList<E> implements IndexedUnsortedList<E> {
         //Sends exception if list is empty
         E result = head.getElement();
         //Stores the element to be returned
-        head = head.getNext();
-        head.setPrevious(null);
-        //Sets new head and removes its previous essentially removing the element
+
+        // If there is only 1 element, reset both head & tail
+        if (count == 1) {
+            head = null;
+            tail = null;
+        } else {
+            // Move head to the next node
+            head = head.getNext();
+            // Remove connection to previous node
+            head.setPrevious(null);
+        }
+        // Update the element & modification counts
         count--;
         modCount++;
-        //Changes counts
         return result;
     }
 
@@ -137,13 +165,20 @@ public class IUDoubleLinkedList<E> implements IndexedUnsortedList<E> {
         if(isEmpty()) throw new NoSuchElementException();
         //Sends exception if the list is empty
         E result = tail.getElement();
-        //Stores the element to be returned
-        tail = tail.getPrevious();
-        tail.setNext(null);
-        //Sets new tail and removes its next to null essentially removing the element
+
+        // If there is only 1 element, reset both head & tail
+        if (count == 1) {
+            head = null;
+            tail = null;
+        } else {
+            // Move tail to previous node
+            tail = tail.getPrevious();
+            // Remove connection to next node
+            tail.setNext(null);
+        }
+        // Update the element & modification counts
         count--;
         modCount++;
-        //Changes counts
         return result;
     }
 
@@ -153,21 +188,31 @@ public class IUDoubleLinkedList<E> implements IndexedUnsortedList<E> {
             //throws exception if there are no elements in the list
         BidirectionalNode<E> sifter = head;
             //Creates node to go through list
-        while(!sifter.getElement().equals(sifter) && sifter != null){
+        while(!sifter.getElement().equals(element) && sifter != null){
             sifter = sifter.getNext();
         }
             //Goes through list until we either get to the end of the list or find the target element
         if(sifter == null){
             throw new NoSuchElementException();
         }
-            //Throws exception if the element doesnt exist
+
+        // Handle removal of the head or tail element
+        if (sifter == head) {
+            return removeFirst();
+        } else if (sifter == tail) {
+            return removeLast();
+        }
+
+        // Store element to be returned
         E result = sifter.getElement();
+
+        // Connect surrounding nodes through sifter
         sifter.getPrevious().setNext(sifter.getNext());
         sifter.getNext().setPrevious(sifter.getPrevious());
-            //Makes a result to keep element and removes the element from the list
+
+        // Update the element & modification counts
         count--;
         modCount++;
-            //Changes counts and returns the object
         return result;
 
 
@@ -175,12 +220,12 @@ public class IUDoubleLinkedList<E> implements IndexedUnsortedList<E> {
 
     @Override
     public E remove(int index) {
-        if(index < 0 || index >= count) throw new NoSuchElementException();
+        if (index < 0 || index >= count) throw new IndexOutOfBoundsException();
             //Throws exception if index is out of bounds of the list
-        if(index == count -1){
+        if (index == count -1){
             return removeLast();
         }
-        if(index == 0){
+        if (index == 0){
             return removeFirst();
         }
             //If the index is at beginning or end of list uses those methods to avoid loop if possible
@@ -204,7 +249,7 @@ public class IUDoubleLinkedList<E> implements IndexedUnsortedList<E> {
 
     @Override
     public void set(int index, E element) {
-        if(index > 0 || index >= count) throw new IndexOutOfBoundsException();
+        if(index < 0 || index >= count) throw new IndexOutOfBoundsException();
         //Catches if index given is outside of the bounds of the list
         BidirectionalNode<E> sifter = head;
         //Creates node to sift through the list
@@ -232,21 +277,22 @@ public class IUDoubleLinkedList<E> implements IndexedUnsortedList<E> {
 
     @Override
     public int indexOf(E element) {
-        if(isEmpty()) throw new NoSuchElementException();
-        //Catches aned throws exception for empty lists
+
+        // New node to traverse the list
         BidirectionalNode<E> sifter = head;
         int index = 0;
-        //Creates node to sort through list
+
+        // Traverse the list until the element is found
         while(!sifter.getElement().equals(element) && sifter != null){
             sifter = sifter.getNext();
             index++;
         }
-        //Goes through list and stops once element is found or reaches end of list which would be null
-        //and increases the index each time
+        
+        // Return -1 if the element is not found
         if(sifter == null){
             return -1;
-            //Returns if the element is null meaning its not found
         }
+        // Return the index of the element
         return index;
     }
 
@@ -266,19 +312,15 @@ public class IUDoubleLinkedList<E> implements IndexedUnsortedList<E> {
 
     @Override
     public boolean contains(E target) {
-        if(isEmpty()) throw new NoSuchElementException();
-        //Catches aned throws exception for empty lists
-        BidirectionalNode<E> sifter = head;
-        //Creates node to sort through list
-        while(!sifter.getElement().equals(target) && sifter != null){
-            sifter = sifter.getNext();
+        
+        // Return true if the target exists in the list
+        int result = indexOf(target);
+
+        if (result != -1) {
+            return true;
+        } else {
+            return false;
         }
-        //Goes through list and stops once element is found or reaches end of list which would be null
-        if(sifter.getElement().equals(target)){
-        return true;
-        }
-        return false;
-        //Returns true if the sifter is the target that we are looking for false if null
     }
 
     @Override
@@ -289,6 +331,23 @@ public class IUDoubleLinkedList<E> implements IndexedUnsortedList<E> {
     @Override
     public int size() {
         return count;
+    }
+
+    @Override
+    public String toString() {
+
+        // Create empty string to store elements
+        String result = "";
+
+        // Helper node to traverse list
+        BidirectionalNode<E> sifter = head;
+
+        // Traverse the list and link/attach each element
+        while (sifter != null) {
+            result += sifter.getElement();
+            sifter = sifter.getNext();
+        }
+        return result;
     }
 
     /*=====ITERATOR METHODS=====*/
